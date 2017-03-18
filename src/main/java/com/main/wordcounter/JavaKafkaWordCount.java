@@ -55,8 +55,7 @@ import org.apache.spark.streaming.kafka.KafkaUtils;
 /*
  * 
  * java -cp original-uber-word.counter-0.0.1-SNAPSHOT.jar
- * com.main.wordcounter.JavaKafkaWordCount hdp-2:2181 hdp-2:9092 test2 12:2181
- * hdp-2:9092 test2 1
+ * com.main.wordcounter.JavaKafkaWordCount zookeper_adress some_test_kafka_group_name topic_name
  */
 public final class JavaKafkaWordCount {
 	private static final Pattern SPACE = Pattern.compile(" ");
