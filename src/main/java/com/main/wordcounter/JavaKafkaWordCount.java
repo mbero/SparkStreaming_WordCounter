@@ -51,6 +51,15 @@ import org.apache.spark.streaming.kafka.KafkaUtils;
  *    zoo03 my-consumer-group topic1,topic2 1`
  */
 
+<<<<<<< HEAD
+=======
+// Example running command for jar builder by maven:shade plugin
+/*
+ * 
+ * java -cp original-uber-word.counter-0.0.1-SNAPSHOT.jar
+ * com.main.wordcounter.JavaKafkaWordCount zookeper_adress some_test_kafka_group_name topic_name
+ */
+>>>>>>> 59c8aac96e1ba909d1ab06e36bd38a57625147ba
 public final class JavaKafkaWordCount {
   private static final Pattern SPACE = Pattern.compile(" ");
 
