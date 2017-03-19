@@ -40,83 +40,72 @@ import org.apache.spark.streaming.kafka.KafkaUtils;
 /**
  * Consumes messages from one or more topics in Kafka and does wordcount.
  *
- * Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads> <zkQuorum>
- * is a list of one or more zookeeper servers that make quorum <group> is the
- * name of kafka consumer group <topics> is a list of one or more kafka topics
- * to consume from <numThreads> is the number of threads the kafka consumer
- * should use
+ * Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>
+ *   <zkQuorum> is a list of one or more zookeeper servers that make quorum
+ *   <group> is the name of kafka consumer group
+ *   <topics> is a list of one or more kafka topics to consume from
+ *   <numThreads> is the number of threads the kafka consumer should use
  *
- * To run this example: `$ bin/run-example
- * org.apache.spark.examples.streaming.JavaKafkaWordCount zoo01,zoo02, \ zoo03
- * my-consumer-group topic1,topic2 1`
+ * To run this example:
+ *   `$ bin/run-example org.apache.spark.examples.streaming.JavaKafkaWordCount zoo01,zoo02, \
+ *    zoo03 my-consumer-group topic1,topic2 1`
  */
 
-// Example running command for jar builder by maven:shade plugin
-/*
- * 
- * java -cp original-uber-word.counter-0.0.1-SNAPSHOT.jar
- * com.main.wordcounter.JavaKafkaWordCount hdp-2:2181 hdp-2:9092 test2 12:2181
- * hdp-2:9092 test2 1
- */
 public final class JavaKafkaWordCount {
-	private static final Pattern SPACE = Pattern.compile(" ");
+  private static final Pattern SPACE = Pattern.compile(" ");
 
-	private JavaKafkaWordCount() {
-	}
+  private JavaKafkaWordCount() {
+  }
 
-	public static void main(String[] args) throws Exception {
-		if (args.length < 4) {
-			System.err.println("Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>");
-			System.exit(1);
-		}
-		SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount").setMaster("local[2]")
-				.set("spark.executor.memory", "1g");
-		// Create the context with 2 seconds batch size
-		JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(2000));
+  public static void main(String[] args) throws Exception {
+    if (args.length < 4) {
+      System.err.println("Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>");
+      System.exit(1);
+    }
 
-		int numThreads = Integer.parseInt(args[3]);
-		Map<String, Integer> topicMap = new HashMap<>();
-		String[] topics = args[2].split(",");
-		for (String topic : topics) {
-			System.out.println("Currently processed topic : " + topic);
-			topicMap.put(topic, numThreads);
-		}
+    SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount");
+    // Create the context with 2 seconds batch size
+    JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(2000));
 
-		JavaPairReceiverInputDStream<String, String> messages = KafkaUtils.createStream(jssc, args[0], args[1],
-				topicMap);
+    int numThreads = Integer.parseInt(args[3]);
+    Map<String, Integer> topicMap = new HashMap<>();
+    String[] topics = args[2].split(",");
+    for (String topic: topics) {
+      topicMap.put(topic, numThreads);
+    }
 
-		JavaDStream<String> lines = messages.map(new Function<Tuple2<String, String>, String>() {
-			@Override
-			public String call(Tuple2<String, String> tuple2) {
-				System.out.println("tuple2 " + tuple2._2);
-				return tuple2._2();
-			}
-		});
+    JavaPairReceiverInputDStream<String, String> messages =
+            KafkaUtils.createStream(jssc, args[0], args[1], topicMap);
 
-		JavaDStream<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
-			@Override
-			// Changed because of lack in compability between 1.6.2 version of
-			// SS and 2.0
-			public Iterable<String> call(String x) {
-				System.out.println("call("+ x +")");
-				Iterable<String> list = Arrays.asList(SPACE.split(x));
-				return list;
-			}
-		});
+    JavaDStream<String> lines = messages.map(new Function<Tuple2<String, String>, String>() {
+      @Override
+      public String call(Tuple2<String, String> tuple2) {
+        return tuple2._2();
+      }
+    });
 
-		JavaPairDStream<String, Integer> wordCounts = words.mapToPair(new PairFunction<String, String, Integer>() {
-			@Override
-			public Tuple2<String, Integer> call(String s) {
-				return new Tuple2<>(s, 1);
-			}
-		}).reduceByKey(new Function2<Integer, Integer, Integer>() {
-			@Override
-			public Integer call(Integer i1, Integer i2) {
-				return i1 + i2;
-			}
-		});
-		wordCounts.print();
-		jssc.start();
-		jssc.awaitTermination();
-	}
+    JavaDStream<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
+      @Override
+      public Iterator<String> call(String x) {
+        return Arrays.asList(SPACE.split(x)).iterator();
+      }
+    });
+
+    JavaPairDStream<String, Integer> wordCounts = words.mapToPair(
+      new PairFunction<String, String, Integer>() {
+        @Override
+        public Tuple2<String, Integer> call(String s) {
+          return new Tuple2<>(s, 1);
+        }
+      }).reduceByKey(new Function2<Integer, Integer, Integer>() {
+        @Override
+        public Integer call(Integer i1, Integer i2) {
+          return i1 + i2;
+        }
+      });
+
+    wordCounts.print();
+    jssc.start();
+    jssc.awaitTermination();
+  }
 }
