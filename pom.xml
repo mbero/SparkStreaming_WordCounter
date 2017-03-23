@@ -16,6 +16,33 @@
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.6</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.2.3-1</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming_2.10 -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-streaming_2.10</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.10</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka_2.10 -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
@@ -23,38 +50,15 @@
 			<version>1.6.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming_2.10 
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming_2.10</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		-->
-	
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming_2.10 -->
-			<dependency>
-			    <groupId>org.apache.spark</groupId>
-			    <artifactId>spark-streaming_2.10</artifactId>
-			    <version>2.0.0</version>
-			</dependency>
 
-				
-		
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core_2.11 
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-twitter_2.11 -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_2.10</artifactId>
+			<artifactId>spark-streaming-twitter_2.11</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-		-->
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core_2.10 -->
-		<dependency>
-		    <groupId>org.apache.spark</groupId>
-		    <artifactId>spark-core_2.10</artifactId>
-		    <version>2.0.0</version>
-		</dependency>
-				
-		
+
+
 
 	</dependencies>
 	<build>
@@ -122,6 +126,7 @@
 				<artifactId>scala-maven-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
+					<scalaVersion>2.10.6</scalaVersion>
 					<recompileMode>incremental</recompileMode>
 					<args>
 						<arg>-target:jvm-1.7</arg>
