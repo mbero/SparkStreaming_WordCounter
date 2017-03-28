@@ -32,7 +32,7 @@ import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
-
+import org.apache.spark.Logging;
 import com.google.common.collect.Lists;
 
 import scala.Tuple2;
@@ -58,25 +58,33 @@ public final class JavaKafkaWordCount {
   }
 
   public static void main(String[] args) {
+	  /*
     if (args.length < 4) {
       System.err.println("Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>");
       System.exit(1);
     }
+    */
 
     SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount").setMaster("spark://osboxes:7077");
     // Create the context with 2 seconds batch size
     JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(2000));
 
-    int numThreads = Integer.parseInt(args[3]);
+    //int numThreads = Integer.parseInt(args[3]);
+    int numThreads = 1;
     Map<String, Integer> topicMap = new HashMap<String, Integer>();
-    String[] topics = args[2].split(",");
+    //String[] topics = args[2].split(",");
+    String[] topics  = new String[1];
+    topics[0]="tweets-text";
     for (String topic: topics) {
       topicMap.put(topic, numThreads);
     }
-
+    /*
     JavaPairReceiverInputDStream<String, String> messages =
             KafkaUtils.createStream(jssc, args[0], args[1], topicMap);
-
+	*/
+    JavaPairReceiverInputDStream<String, String> messages =
+            KafkaUtils.createStream(jssc, "localhost:2181", "testKafkaGroupName ", topicMap);
+    
     JavaDStream<String> lines = messages.map(new Function<Tuple2<String, String>, String>() {
       @Override
       public String call(Tuple2<String, String> tuple2) {
