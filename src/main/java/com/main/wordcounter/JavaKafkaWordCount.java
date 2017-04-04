@@ -71,9 +71,7 @@ public final class JavaKafkaWordCount {
     JavaPairReceiverInputDStream<String, String> messages =
     		org.apache.spark.streaming.kafka.KafkaUtils.createStream(jssc, args[0], args[1], topicMap);
     
-
     JavaDStream<String> lines = messages.map(Tuple2::_2);
-
     JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
 
     JavaPairDStream<String, Integer> wordCounts = words.mapToPair(s -> new Tuple2<>(s, 1))
