@@ -16,6 +16,7 @@
 	</repositories>
 
 	<dependencies>
+		 
 		<dependency>
 			<groupId>sample</groupId>
 			<artifactId>com.sample</artifactId>
@@ -23,6 +24,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/spark-core_2.11-1.5.2.logging.jar</systemPath>
 		</dependency>
+		 
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-streaming_2.11</artifactId>

@@ -28,7 +28,6 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka010.KafkaUtils;
 
 import scala.Tuple2;
 /**
@@ -57,7 +56,8 @@ public final class JavaKafkaWordCount {
       System.exit(1);
     }
 
-    SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount").setMaster("spark://osboxes:7077");;
+    //SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount").setMaster("spark://osboxes:7077");;
+    SparkConf sparkConf = new SparkConf().setAppName("JavaKafkaWordCount").setMaster("local[2]");
     // Create the context with 2 seconds batch size
     JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(2000));
 
