@@ -51,6 +51,12 @@ public final class JavaKafkaWordCount {
   }
 
   public static void main(String[] args) throws Exception {
+	args= new String[4];
+	args[0] = "localhost:2181";
+	args[1] = "testKafkaGroupName";
+	args[2] = "tweets-text";
+	args[3] = "4";
+	
     if (args.length < 4) {
       System.err.println("Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>");
       System.exit(1);
@@ -77,6 +83,9 @@ public final class JavaKafkaWordCount {
     JavaPairDStream<String, Integer> wordCounts = words.mapToPair(s -> new Tuple2<>(s, 1))
         .reduceByKey((i1, i2) -> i1 + i2);
 
+    //wordCounts.
+    JavaDStream<Long> countedWords = wordCounts.count();
+    countedWords.print();
     wordCounts.print();
     jssc.start();
     jssc.awaitTermination();
