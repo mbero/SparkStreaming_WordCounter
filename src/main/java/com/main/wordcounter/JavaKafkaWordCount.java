@@ -19,16 +19,21 @@ package com.main.wordcounter;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
 
+import io.netty.handler.codec.string.StringDecoder;
 import scala.Tuple2;
 /**
  * Consumes messages from one or more topics in Kafka and does wordcount.
@@ -52,10 +57,10 @@ public final class JavaKafkaWordCount {
 
   public static void main(String[] args) throws Exception {
 	args= new String[4];
-	args[0] = "localhost:2181";
-	args[1] = "testKafkaGroupName";
-	args[2] = "tweets-text";
-	args[3] = "4";
+	args[0] ="hdp-3.tap-psnc.net:2181";
+	args[1] = "mygroup";
+	args[2] = "kafka-test";
+	args[3] = "1";
 	
     if (args.length < 4) {
       System.err.println("Usage: JavaKafkaWordCount <zkQuorum> <group> <topics> <numThreads>");
@@ -73,11 +78,27 @@ public final class JavaKafkaWordCount {
     for (String topic: topics) {
       topicMap.put(topic, numThreads);
     }
-
+    
+    /* Not direct input stream
     JavaPairReceiverInputDStream<String, String> messages =
     		org.apache.spark.streaming.kafka.KafkaUtils.createStream(jssc, args[0], args[1], topicMap);
+    */
+    Map<String, String> kafkaParams = new HashMap<String, String>();
+    kafkaParams.put("metadata.broker.list", "hdp-2.tap-psnc.net:6667");
+    kafkaParams.put("bootstrap.servers", "hdp-2.tap-psnc.net:6667");
+    kafkaParams.put("group.id", "mygroup");
+    kafkaParams.put("zookeeper.connect", "hdp-3.tap-psnc.net:2181");
+   
     
-    JavaDStream<String> lines = messages.map(Tuple2::_2);
+    Set<String> topicsSet = new HashSet<String>(Arrays.asList(topics[0]));
+    
+    JavaPairInputDStream<String, String> directKafkaStream =
+    		//(JavaStreamingContext, Class<K>, Class<V>, Class<KD>, Class<VD>, Map<String,String>, Set<String>)
+    		org.apache.spark.streaming.kafka.KafkaUtils.createDirectStream(jssc, String.class, String.class, kafka.serializer.StringDecoder.class,kafka.serializer.StringDecoder.class, kafkaParams, topicsSet);
+    		
+    		//createDirectStream(jssc, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topicsSet);
+    		
+    JavaDStream<String> lines = directKafkaStream.map(Tuple2::_2);
     JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
 
     JavaPairDStream<String, Integer> wordCounts = words.mapToPair(s -> new Tuple2<>(s, 1))
