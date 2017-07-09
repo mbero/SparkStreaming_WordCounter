@@ -16,7 +16,7 @@
 	</repositories>
 
 	<dependencies>
-
+		 
 		<dependency>
 			<groupId>sample</groupId>
 			<artifactId>com.sample</artifactId>
@@ -24,21 +24,21 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/spark-core_2.11-1.5.2.logging.jar</systemPath>
 		</dependency>
-
+		 
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-streaming_2.11</artifactId>
 			<version>2.1.0</version>
 		</dependency>
 
-
+		  
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_2.11</artifactId>
 			<version>2.1.0</version>
 		</dependency>
-
-
+		
+		
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
@@ -52,11 +52,6 @@
 			<version>1.6.3</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.10</artifactId>
-			<version>0.8.2.2</version>
-		</dependency>
 
 	</dependencies>
 	<build>
